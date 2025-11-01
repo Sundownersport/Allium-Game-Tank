@@ -3,6 +3,7 @@ mod apps;
 mod entry_list;
 mod games;
 mod recents;
+mod search_results;
 mod settings;
 mod toast;
 
