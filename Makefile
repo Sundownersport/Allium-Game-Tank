@@ -87,12 +87,14 @@ $(DIST_DIR)/.allium/bin/dufs:
 	cd third-party/dufs && cross build --release --target=$(CROSS_TARGET_TRIPLE)
 	cp "third-party/dufs/target/$(CROSS_TARGET_TRIPLE)/release/dufs" "$(DIST_DIR)/.allium/bin/"
 
+SYNCTHING_VERSION := "v2.0.10"
+SYNCTHING_URL := "https://github.com/syncthing/syncthing/releases/download/$(SYNCTHING_VERSION)/syncthing-linux-arm-$(SYNCTHING_VERSION).tar.gz"
 $(DIST_DIR)/.allium/bin/syncthing:
-	cd "$$(mktemp --directory)"
-	wget "https://github.com/syncthing/syncthing/releases/download/v2.0.10/syncthing-linux-arm-v2.0.10.tar.gz" -O syncthing.tar.gz
-	tar xf syncthing.tar.gz
-	mv "syncthing-linux-arm-v2.0.10/syncthing" "$(DIST_DIR)/.allium/bin/syncthing"
-	strip -s "$(DIST_DIR)/.allium/bin/syncthing" || true
+	TEMP_DIR=$$(mktemp --directory) && \
+		wget "$(SYNCTHING_URL)" -O "$$TEMP_DIR/syncthing.tar.gz" && \
+		tar xf "$$TEMP_DIR/syncthing.tar.gz" --directory="$$TEMP_DIR" && \
+		mv "$$TEMP_DIR/syncthing-linux-arm-$(SYNCTHING_VERSION)/syncthing" "$(DIST_DIR)/.allium/bin/syncthing" && \
+		strip --strip-all "$(DIST_DIR)/.allium/bin/syncthing" || true
 
 DRASTIC_URL := https://github.com/steward-fu/nds/releases/download/v1.8/drastic-v1.8_miyoo.zip
 $(DIST_DIR)/.allium/cores/drastic/launch.sh:
