@@ -259,6 +259,7 @@ where
                 commands.send(Command::Exit).await?;
             }
             MenuEntry::Reset => {
+                RetroArchCommand::Unpause.send().await?;
                 RetroArchCommand::Reset.send().await?;
                 commands.send(Command::Exit).await?;
             }
