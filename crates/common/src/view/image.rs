@@ -6,6 +6,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use embedded_graphics::Drawable;
 use embedded_graphics::image::ImageRaw;
+use fast_image_resize::{PixelType, ResizeAlg, ResizeOptions, Resizer, images::Image as FirImage};
 use image::{RgbaImage, imageops};
 use log::{error, trace};
 use serde::{Deserialize, Serialize};
@@ -87,6 +88,31 @@ impl Image {
         self
     }
 
+    fn resize_image(src_image: &RgbaImage, new_width: u32, new_height: u32) -> Option<RgbaImage> {
+        let src = FirImage::from_vec_u8(
+            src_image.width(),
+            src_image.height(),
+            src_image.as_raw().clone(),
+            PixelType::U8x4,
+        )
+        .ok()?;
+
+        let mut dst = FirImage::new(new_width, new_height, PixelType::U8x4);
+
+        let mut resizer = Resizer::new();
+        resizer
+            .resize(
+                &src,
+                &mut dst,
+                &ResizeOptions::new().resize_alg(ResizeAlg::Convolution(
+                    fast_image_resize::FilterType::Bilinear,
+                )),
+            )
+            .ok()?;
+
+        RgbaImage::from_raw(new_width, new_height, dst.into_vec())
+    }
+
     fn image(
         &self,
         path: &Path,
@@ -103,7 +129,8 @@ impl Image {
                 if image.width() == rect.w && image.height() == rect.h {
                     image.to_rgba8()
                 } else {
-                    imageops::resize(&image, rect.w, rect.h, imageops::FilterType::Lanczos3)
+                    let rgba = image.to_rgba8();
+                    Self::resize_image(&rgba, rect.w, rect.h)?
                 }
             }
             ImageMode::Contain => {
@@ -112,12 +139,8 @@ impl Image {
                 } else {
                     let new_height = rect.h.min(rect.w * image.height() / image.width());
                     let new_width = rect.w.min(rect.h * image.width() / image.height());
-                    imageops::resize(
-                        &image,
-                        new_width,
-                        new_height,
-                        imageops::FilterType::Lanczos3,
-                    )
+                    let rgba = image.to_rgba8();
+                    Self::resize_image(&rgba, new_width, new_height)?
                 }
             }
         };
@@ -152,9 +175,9 @@ impl View for Image {
         _styles: &Stylesheet,
     ) -> Result<bool> {
         let image_loaded = if let Some(ref path) = self.path {
-            let image_opt = self.image.get_or_init(|| {
-                self.image(path, self.rect, self.mode, self.border_radius)
-            });
+            let image_opt = self
+                .image
+                .get_or_init(|| self.image(path, self.rect, self.mode, self.border_radius));
             image_opt.is_some()
         } else {
             false
