@@ -133,7 +133,7 @@ ifndef SDCARD_PATH
 	$(error SDCARD_PATH is not set. Create a local.mk file with SDCARD_PATH=/path/to/sdcard or set it as an environment variable)
 endif
 	@echo "Deploying to $(SDCARD_PATH)..."
-	rsync -av $(DIST_DIR)/.allium $(DIST_DIR)/.tmp_update $(DIST_DIR)/Apps $(SDCARD_PATH)/
+	rsync --progress --modify-window=1 --update --recursive --times --verbose $(DIST_DIR)/.allium $(DIST_DIR)/.tmp_update $(DIST_DIR)/Apps $(SDCARD_PATH)/
 	@echo "Deployment complete! Remember to eject your SD card properly."
 
 .PHONY: deploy-all
@@ -142,5 +142,5 @@ ifndef SDCARD_PATH
 	$(error SDCARD_PATH is not set. Create a local.mk file with SDCARD_PATH=/path/to/sdcard or set it as an environment variable)
 endif
 	@echo "Deploying full dist to $(SDCARD_PATH)..."
-	rsync -av --delete $(DIST_DIR)/ $(SDCARD_PATH)/
+	rsync --progress --modify-window=1 --update --recursive --times --verbose --delete $(DIST_DIR)/ $(SDCARD_PATH)/
 	@echo "Full deployment complete! Remember to eject your SD card properly."
