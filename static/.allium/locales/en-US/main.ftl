@@ -10,7 +10,7 @@ sort-most-played = Sort: Playtime
 sort-rating = Sort: Rating
 sort-release-date = Sort: Release Date
 sort-random = Sort: Random
-sort-search = Sort: Search
+sort-search = Search
 sort-favorites = Sort: Favorites
 sort-relevance = Sort: Relevance
 

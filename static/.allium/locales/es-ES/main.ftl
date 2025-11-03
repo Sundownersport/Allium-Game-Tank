@@ -10,7 +10,7 @@ sort-most-played = Orden: Más jugados
 sort-rating = Orden: Calificación
 sort-release-date = Orden: Fecha de lanzamiento
 sort-random = Orden: Aleatorio
-sort-search = Orden: Buscar
+sort-search = Buscar
 sort-favorites = Orden: Favoritos
 
 no-recent-games = Juega un juego para empezar

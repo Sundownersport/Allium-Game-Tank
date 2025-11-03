@@ -10,7 +10,7 @@ sort-most-played = Tri: Temps
 sort-rating = Tri: Note
 sort-release-date = Tri: Date de sortie
 sort-random = Tri: Aléatoire
-sort-search = Tri: Recherche
+sort-search = Recherche
 sort-favorites = Tri: Favoris
 
 no-recent-games = Lancez un jeu pour commencer

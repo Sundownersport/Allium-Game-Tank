@@ -10,7 +10,7 @@ sort-most-played = Ordine: Activitate
 sort-rating = Ordine: Evaluare
 sort-release-date = Ordine: Dată de lansare
 sort-random = Ordine: Aleatoriu
-sort-search = Ordine: Caută
+sort-search = Caută
 sort-favorites = Ordine: Favorite
 
 no-recent-games = Joacă un joc pentru a începe
