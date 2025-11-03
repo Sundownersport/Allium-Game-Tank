@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -29,12 +30,12 @@ pub enum ImageMode {
     Contain,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Image {
     rect: Rect,
     path: Option<PathBuf>,
     #[serde(skip)]
-    image: Option<RgbaImage>,
+    image: OnceLock<Option<RgbaImage>>,
     mode: ImageMode,
     border_radius: u32,
     alignment: Alignment,
@@ -46,7 +47,7 @@ impl Image {
         Self {
             rect,
             path: Some(path),
-            image: None,
+            image: OnceLock::new(),
             mode,
             border_radius: 0,
             alignment: Alignment::Left,
@@ -64,7 +65,7 @@ impl Image {
         Self {
             rect,
             path: None,
-            image: None,
+            image: OnceLock::new(),
             mode,
             border_radius: 0,
             alignment: Alignment::Left,
@@ -74,7 +75,7 @@ impl Image {
 
     pub fn set_path(&mut self, path: Option<PathBuf>) -> &mut Self {
         if path != self.path {
-            self.image = None;
+            self.image = OnceLock::new();
             self.dirty = true;
             self.path = path;
         }
@@ -150,17 +151,17 @@ impl View for Image {
         display: &mut <DefaultPlatform as Platform>::Display,
         _styles: &Stylesheet,
     ) -> Result<bool> {
-        let image_loaded = if self.image.is_none()
-            && let Some(ref path) = self.path
-        {
-            self.image = self.image(path, self.rect, self.mode, self.border_radius);
-            self.image.is_some()
+        let image_loaded = if let Some(ref path) = self.path {
+            let image_opt = self.image.get_or_init(|| {
+                self.image(path, self.rect, self.mode, self.border_radius)
+            });
+            image_opt.is_some()
         } else {
-            self.image.is_some()
+            false
         };
 
         display.load(self.rect)?;
-        if let Some(ref image) = self.image {
+        if let Some(Some(image)) = self.image.get() {
             let image: ImageRaw<'_, Color> = ImageRaw::new(image, self.rect.w);
             let image = embedded_graphics::image::Image::new(&image, self.rect.top_left().into());
             trace!("drawing image: {:?}", self.rect);
