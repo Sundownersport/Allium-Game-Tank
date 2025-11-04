@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy: 
       matrix:
-        target: [ arm-unknown-linux-gnueabihf ]
+        target: [ armv7-unknown-linux-gnueabihf ]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -97,12 +97,11 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
+      - name: Install cargo-zigbuild
+        run: pip install cargo-zigbuild
+
       - name: Build target
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --bins --target ${{ matrix.target }}
+        run: cargo zigbuild --release --bins --target ${{ matrix.target }}
 
       - name: Package
         shell: bash
@@ -127,7 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [ arm-unknown-linux-gnueabihf ]
+        target: [ armv7-unknown-linux-gnueabihf ]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -142,12 +141,11 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
+      - name: Install cargo-zigbuild
+        run: pip install cargo-zigbuild
+
       - name: Build target
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --bins --target ${{ matrix.target }}
+        run: cargo zigbuild --release --bins --target ${{ matrix.target }}
 
       - name: Package
         shell: bash
