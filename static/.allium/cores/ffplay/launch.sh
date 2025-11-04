@@ -1,9 +1,5 @@
 #!/bin/sh
 
-if [ -f /mnt/SDCARD/.tmp_update/script/stop_audioserver.sh ]; then
-    /mnt/SDCARD/.tmp_update/script/stop_audioserver.sh
-fi
-
 set_snd_level() {
     local start_time
     local elapsed_time

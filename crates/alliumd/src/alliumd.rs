@@ -211,6 +211,8 @@ impl AlliumD<DefaultPlatform> {
                     _ = tokio::time::sleep(auto_sleep_duration) => {
                         if !self.power_settings.auto_sleep_when_charging && battery.charging() {
                             info!("battery charging, don't auto sleep");
+                        } else if Path::new("/tmp/stay_awake").exists() {
+                            info!("/tmp/stay_awake exists, don't auto sleep");
                         } else {
                             info!("idle timeout, shutting down");
                             self.handle_quit().await?;
