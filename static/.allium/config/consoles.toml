@@ -547,5 +547,6 @@ extensions = ["nds"]
 
 [[consoles]]
 name = "Movies"
+cores = ["ffplay"]
 patterns = ["MEDIA", "Movies"]
 extensions = ["3g2", "3gp", "aac", "avi", "flv", "m4a", "m4a", "mkv", "mj2", "mov", "mp3", "mp4", "mpeg", "ogg", "oss", "wav", "webm"]
