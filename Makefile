@@ -142,5 +142,5 @@ ifndef SDCARD_PATH
 	$(error SDCARD_PATH is not set. Create a local.mk file with SDCARD_PATH=/path/to/sdcard or set it as an environment variable)
 endif
 	@echo "Deploying full dist to $(SDCARD_PATH)..."
-	rsync --progress --modify-window=1 --update --recursive --times --verbose --delete $(DIST_DIR)/ $(SDCARD_PATH)/
+	rsync --progress --modify-window=1 --update --recursive --times --verbose --delete $(DIST_DIR)/.allium $(DIST_DIR)/.tmp_update $(DIST_DIR)/Apps $(SDCARD_PATH)/
 	@echo "Full deployment complete! Remember to eject your SD card properly."
