@@ -104,8 +104,8 @@ $(DIST_DIR)/.allium/cores/drastic/drastic:
 
 .PHONY: lint
 lint:
-	cargo fmt --all -- --check
 	cargo clippy --fix --allow-dirty --allow-staged --all-targets -- -D warnings
+	cargo fmt --all
 
 .PHONY: bump-version
 bump-version: lint

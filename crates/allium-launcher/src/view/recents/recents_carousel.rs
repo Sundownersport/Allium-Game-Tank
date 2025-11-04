@@ -19,15 +19,9 @@ use tokio::sync::mpsc::Sender;
 use crate::consoles::ConsoleMapper;
 use crate::entry::game::Game;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct RecentsCarouselState {
     pub selected: usize,
-}
-
-impl Default for RecentsCarouselState {
-    fn default() -> Self {
-        Self { selected: 0 }
-    }
 }
 
 #[derive(Debug)]
@@ -253,10 +247,8 @@ impl View for RecentsCarousel {
                 None,
             );
             drawn |= empty_label.draw(display, styles)?;
-        } else {
-            if self.game_name.should_draw() {
-                drawn |= self.game_name.draw(display, styles)?;
-            }
+        } else if self.game_name.should_draw() {
+            drawn |= self.game_name.draw(display, styles)?;
         }
 
         if self.button_hints.should_draw() {

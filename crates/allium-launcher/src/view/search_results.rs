@@ -361,21 +361,20 @@ impl View for SearchResultsView {
         commands: Sender<Command>,
         bubble: &mut VecDeque<Command>,
     ) -> Result<bool> {
-        if self.search_view.is_active() {
-            if self
+        if self.search_view.is_active()
+            && self
                 .search_view
                 .handle_key_event(event, commands.clone(), bubble)
                 .await?
-            {
-                for cmd in bubble.iter() {
-                    if let Command::Search(new_query) = cmd {
-                        self.update_query(new_query.clone())?;
-                        commands.send(Command::Redraw).await?;
-                        break;
-                    }
+        {
+            for cmd in bubble.iter() {
+                if let Command::Search(new_query) = cmd {
+                    self.update_query(new_query.clone())?;
+                    commands.send(Command::Redraw).await?;
+                    break;
                 }
-                return Ok(true);
             }
+            return Ok(true);
         }
 
         match event {

@@ -327,7 +327,7 @@ where
             || self
                 .search_results
                 .as_ref()
-                .map_or(false, |sr| sr.should_draw())
+                .is_some_and(|sr| sr.should_draw())
     }
 
     fn set_should_draw(&mut self) {
@@ -347,43 +347,41 @@ where
         commands: Sender<Command>,
         bubble: &mut VecDeque<Command>,
     ) -> Result<bool> {
-        if let Some(search_results) = &mut self.search_results {
-            if search_results
+        if let Some(search_results) = &mut self.search_results
+            && search_results
                 .handle_key_event(event, commands.clone(), bubble)
                 .await?
-            {
-                let mut close_search = false;
-                for cmd in bubble.iter() {
-                    match cmd {
-                        Command::CloseView => {
-                            close_search = true;
-                        }
-                        Command::Search(_) => {}
-                        _ => {}
+        {
+            let mut close_search = false;
+            for cmd in bubble.iter() {
+                match cmd {
+                    Command::CloseView => {
+                        close_search = true;
                     }
+                    Command::Search(_) => {}
+                    _ => {}
                 }
-                if close_search {
-                    self.close_search_results();
-                }
-                bubble.clear();
-                return Ok(true);
             }
+            if close_search {
+                self.close_search_results();
+            }
+            bubble.clear();
+            return Ok(true);
         }
 
-        if self.search_view.is_active() {
-            if self
+        if self.search_view.is_active()
+            && self
                 .search_view
                 .handle_key_event(event, commands.clone(), bubble)
                 .await?
-            {
-                for cmd in bubble.iter() {
-                    if let Command::Search(query) = cmd {
-                        self.search(query.clone())?;
-                    }
+        {
+            for cmd in bubble.iter() {
+                if let Command::Search(query) = cmd {
+                    self.search(query.clone())?;
                 }
-                bubble.clear();
-                return Ok(true);
             }
+            bubble.clear();
+            return Ok(true);
         }
 
         if self
