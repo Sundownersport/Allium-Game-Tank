@@ -126,8 +126,18 @@ async fn spawn_main() -> Result<Child> {
 
 impl AlliumD<DefaultPlatform> {
     pub async fn new() -> Result<AlliumD<DefaultPlatform>> {
-        let platform = DefaultPlatform::new()?;
+        let mut platform = DefaultPlatform::new()?;
         let state = AlliumDState::load()?;
+
+        info!("setting volume: {}", state.volume);
+        platform.set_volume(state.volume)?;
+
+        info!("setting brightness: {}", state.brightness);
+        platform.set_brightness(state.brightness)?;
+
+        info!("loading display settings");
+        platform.set_display_settings(&mut DisplaySettings::load()?)?;
+
         let main = spawn_main().await?;
         let locale = Locale::new(&LocaleSettings::load()?.lang);
         let power_settings = PowerSettings::load()?;
@@ -148,16 +158,6 @@ impl AlliumD<DefaultPlatform> {
 
     pub async fn run_event_loop(&mut self) -> Result<()> {
         info!("hello from Allium {}", ALLIUM_VERSION);
-
-        info!("setting volume: {}", self.state.volume);
-        self.platform.set_volume(self.state.volume)?;
-
-        info!("setting brightness: {}", self.state.brightness);
-        self.platform.set_brightness(self.state.brightness)?;
-
-        info!("loading display settings");
-        self.platform
-            .set_display_settings(&mut DisplaySettings::load()?)?;
 
         if DefaultPlatform::has_wifi() {
             info!("wifi detected, loading wifi settings");
