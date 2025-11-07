@@ -241,13 +241,14 @@ impl DrawTarget for SimulatorWindow {
     {
         let pixels: Vec<_> = pixels
             .into_iter()
-            .map(|p| {
+            .filter_map(|p| {
                 if p.0.x < 0
                     || p.0.y < 0
-                    || p.0.x > *SCREEN_WIDTH as i32
-                    || p.0.y > *SCREEN_HEIGHT as i32
+                    || p.0.x >= *SCREEN_WIDTH as i32
+                    || p.0.y >= *SCREEN_HEIGHT as i32
                 {
-                    panic!("Pixel out of bounds: {:?}", p);
+                    warn!("Pixel out of bounds: {:?}", p);
+                    return None;
                 }
                 let curr = self.display.get_pixel(p.0);
                 let color = p.1;
@@ -259,7 +260,7 @@ impl DrawTarget for SimulatorWindow {
                 let g = (curr.g() as u32 * a_inv + color.g() as u32 * a) / 255;
                 let r = (curr.r() as u32 * a_inv + color.r() as u32 * a) / 255;
 
-                Pixel(p.0, Color::new(r as u8, g as u8, b as u8))
+                Some(Pixel(p.0, Color::new(r as u8, g as u8, b as u8)))
             })
             .collect();
         Ok(self.display.draw_iter(pixels)?)
