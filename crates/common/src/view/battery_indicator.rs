@@ -102,9 +102,9 @@ where
             };
             let w = styles.status_bar_font_size() as u32;
             let h = (styles.status_bar_font_size() * 3.0 / 5.0) as u32;
-            let y = styles.ui_font.size as i32 / 6 + 1;
-            let margin = styles.ui_font.size as i32 * 2 / 28;
-            let stroke = styles.ui_font.size as i32 * 3 / 28;
+            let y = styles.status_bar_font_size() as i32 / 6 + 1;
+            let margin = styles.status_bar_font_size() as i32 * 2 / 28;
+            let stroke = styles.status_bar_font_size() as i32 * 3 / 28;
             let x = if self.battery.charging() {
                 (-styles.status_bar_font_size() * 5.0 / 7.0) as i32 - label_w
             } else {
@@ -138,8 +138,10 @@ where
                     Rect::new(
                         x + self.point.x - w as i32 + stroke - margin,
                         y + self.point.y + stroke + margin,
-                        (w - 2 * (stroke + margin) as u32) * (percentage - 5).max(0) as u32 / 90,
-                        h - 2 * (stroke + margin) as u32,
+                        w.saturating_sub(2 * (stroke + margin) as u32)
+                            * (percentage - 5).max(0) as u32
+                            / 90,
+                        h.saturating_sub(2 * (stroke + margin) as u32),
                     )
                     .into(),
                     CornerRadii::new(Size::new_equal(stroke as u32)),
@@ -158,7 +160,7 @@ where
                     x + self.point.x - margin,
                     y + self.point.y + stroke + margin,
                     stroke as u32,
-                    h - 2 * (stroke + margin) as u32,
+                    h.saturating_sub(2 * (stroke + margin) as u32),
                 )
                 .into(),
                 CornerRadii::new(Size::new_equal(stroke as u32)),
@@ -259,8 +261,8 @@ where
 
     fn bounding_box(&mut self, styles: &Stylesheet) -> Rect {
         let font_size = styles.status_bar_font_size() as u32;
-        let margin = styles.ui_font.size as i32 * 2 / 28;
-        let stroke = styles.ui_font.size as i32 * 3 / 28;
+        let margin = styles.status_bar_font_size() as i32 * 2 / 28;
+        let stroke = styles.status_bar_font_size() as i32 * 3 / 28;
 
         // Label width
         let label_w = if self.battery.charging() {
@@ -278,7 +280,7 @@ where
         let left = self.point.x - label_w - battery_w;
         let top = self.point.y;
         let right = self.point.x;
-        let bottom = self.point.y + (styles.ui_font.size as f32 * 3.0 / 5.0) as i32;
+        let bottom = self.point.y + (styles.status_bar_font_size() as f32 * 3.0 / 5.0) as i32;
 
         Rect::new(left, top, (right - left) as u32, (bottom - top) as u32)
     }
