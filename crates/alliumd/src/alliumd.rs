@@ -248,7 +248,7 @@ impl AlliumD<DefaultPlatform> {
     }
 
     async fn handle_key_event(&mut self, key_event: KeyEvent) -> Result<()> {
-        info!(
+        debug!(
             "menu: {:?}, main: {:?}, ingame: {}, key_event: {:?}",
             self.menu.as_ref().map(tokio::process::Child::id),
             self.main.id(),
