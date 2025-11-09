@@ -24,7 +24,6 @@ use tokio::process::{Child, Command};
 use common::database::Database;
 use common::game_info::GameInfo;
 use common::platform::{DefaultPlatform, Key, KeyEvent, Platform};
-use tokio::task::JoinHandle;
 
 #[cfg(unix)]
 use {

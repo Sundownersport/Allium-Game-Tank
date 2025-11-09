@@ -6,7 +6,7 @@ use std::time::Duration;
 use wait_timeout::ChildExt;
 
 use anyhow::Result;
-use log::trace;
+use log::{debug, trace};
 use serde::Deserialize;
 
 use crate::battery::Battery;
@@ -63,7 +63,7 @@ impl Battery for Miyoo354Battery {
     }
 
     fn update_led(enabled: bool) {
-        info!("setting battery LED to {}", enabled);
+        debug!("setting battery LED to {}", enabled);
         if !Path::new("/sys/class/gpio/gpio86").exists() {
             let _ = File::create("/sys/class/gpio/export").and_then(|mut f| f.write_all(b"86"));
         }
