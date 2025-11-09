@@ -159,10 +159,7 @@ impl SearchResultsView {
         let result_text = {
             let locale = res.get::<Locale>();
             let mut map = HashMap::new();
-            map.insert(
-                "count".into(),
-                LocaleFluentValue::from(entry_count.to_string()),
-            );
+            map.insert("count".into(), LocaleFluentValue::from(entry_count));
             locale.ta("search-games-found", &map)
         };
 
@@ -218,13 +215,6 @@ impl SearchResultsView {
                         sort.button_hint(&locale),
                         Alignment::Right,
                     ),
-                    ButtonHint::new(
-                        res.clone(),
-                        Point::zero(),
-                        Key::X,
-                        locale.t("button-edit-search"),
-                        Alignment::Right,
-                    ),
                 ]
             },
             Alignment::Right,
@@ -261,17 +251,11 @@ impl SearchResultsView {
         self.list.sort(sort)?;
         self.update_sort_button_hint();
 
-        let result_text = if entry_count == 0 {
-            self.res.get::<Locale>().t("no-search-results")
-        } else if entry_count == 1 {
-            self.res.get::<Locale>().t("one-search-result")
-        } else {
+        let result_text = {
+            let locale = self.res.get::<Locale>();
             let mut map = HashMap::new();
-            map.insert(
-                "count".into(),
-                LocaleFluentValue::from(entry_count.to_string()),
-            );
-            self.res.get::<Locale>().ta("n-search-results", &map)
+            map.insert("count".into(), LocaleFluentValue::from(entry_count));
+            locale.ta("search-games-found", &map)
         };
         self.result_count.set_text(result_text);
 
