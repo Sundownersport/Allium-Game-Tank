@@ -281,6 +281,7 @@ impl View for SearchResultsView {
         let needs_full_redraw = self.header.should_draw() || self.result_count.should_draw();
 
         if needs_full_redraw {
+            display.load(self.rect)?;
             let button_hint_height = ButtonIcon::diameter(styles) + 16;
             let background_rect = Rectangle::new(
                 embedded_graphics::prelude::Point::new(self.rect.x, self.rect.y),
