@@ -9,6 +9,8 @@
   packages = with pkgs; [
     rustup
     cargo-zigbuild
+    cargo-watch
+    cargo-nextest
     zig
     docker
     sdl2-compat # Simulator currently crashes immediately: https://github.com/libsdl-org/sdl2-compat/issues/508
