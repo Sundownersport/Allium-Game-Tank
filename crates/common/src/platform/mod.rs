@@ -2,9 +2,9 @@
 mod mock;
 
 #[cfg(feature = "miyoo")]
-mod miyoo;
+pub mod miyoo;
 #[cfg(feature = "simulator")]
-mod simulator;
+pub mod simulator;
 
 use anyhow::Result;
 use async_trait::async_trait;

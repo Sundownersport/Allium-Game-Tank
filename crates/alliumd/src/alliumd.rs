@@ -139,6 +139,9 @@ impl AlliumD<DefaultPlatform> {
         info!("loading display settings");
         platform.set_display_settings(&mut DisplaySettings::load()?)?;
 
+        #[cfg(feature = "miyoo")]
+        common::platform::miyoo::try_fix_resolution()?;
+
         let main = spawn_main().await?;
         let locale = Locale::new(&LocaleSettings::load()?.lang);
         let power_settings = PowerSettings::load()?;

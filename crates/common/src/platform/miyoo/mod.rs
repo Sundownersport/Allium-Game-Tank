@@ -219,6 +219,39 @@ fn parse_firmware(data: &str) -> &str {
     ""
 }
 
+pub fn try_fix_resolution() -> Result<()> {
+    if let Some((width, height)) = try_detect_resolution() {
+        Command::new("fbset")
+            .arg("-g")
+            .arg(width.to_string())
+            .arg(height.to_string())
+            .arg(width.to_string())
+            .arg((height * 3).to_string())
+            .arg("32") // bpp
+            .spawn()?;
+    }
+    Ok(())
+}
+
+fn try_detect_resolution() -> Option<(u32, u32)> {
+    let content = std::fs::read_to_string("/proc/mi_modules/fb/mi_fb0").ok()?;
+    let line = content
+        .lines()
+        .find(|l| l.contains("Current TimingWidth="))?;
+
+    let start = line.find("Current TimingWidth=")?;
+    let rest = &line[start + "Current TimingWidth=".len()..];
+    let (width, rest) = rest.split_once(',')?;
+    let width: u32 = width.parse().ok()?;
+
+    let height_start = rest.find("TimingWidth=")?;
+    let rest = &rest[height_start + "TimingWidth=".len()..];
+    let (height, _) = rest.split_once(',')?;
+    let height: u32 = height.parse().ok()?;
+
+    Some((width, height))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

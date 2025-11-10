@@ -4,7 +4,6 @@ use embedded_graphics::prelude::*;
 use embedded_graphics::primitives::Rectangle;
 use framebuffer::Framebuffer;
 use log::{trace, warn};
-use std::fs::OpenOptions;
 
 use crate::display::Display;
 use crate::display::color::Color;
@@ -24,20 +23,11 @@ pub struct FramebufferDisplay {
 
 impl FramebufferDisplay {
     pub fn new() -> Result<FramebufferDisplay> {
-        let mut iface = Framebuffer::new("/dev/fb0")?;
+        let iface = Framebuffer::new("/dev/fb0")?;
         trace!(
             "init fb: var_screen_info: {:?}, fix_screen_info: {:?}",
             iface.var_screen_info, iface.fix_screen_info,
         );
-
-        if let Some((width, height)) = try_detect_resolution() {
-            iface.var_screen_info.xres = width;
-            iface.var_screen_info.yres = height;
-            iface.var_screen_info.xres_virtual = width;
-            iface.var_screen_info.yres_virtual = height * 2;
-            let device = OpenOptions::new().read(true).write(true).open("/dev/fb0")?;
-            Framebuffer::put_var_screeninfo(&device, &iface.var_screen_info)?;
-        }
 
         let background = iface.read_frame();
         let size = Size::new(iface.var_screen_info.xres, iface.var_screen_info.yres);
@@ -224,23 +214,4 @@ impl OriginDimensions for Buffer {
     fn size(&self) -> Size {
         self.size
     }
-}
-
-fn try_detect_resolution() -> Option<(u32, u32)> {
-    let content = std::fs::read_to_string("/proc/mi_modules/fb/mi_fb0").ok()?;
-    let line = content
-        .lines()
-        .find(|l| l.contains("Current TimingWidth="))?;
-
-    let start = line.find("Current TimingWidth=")?;
-    let rest = &line[start + "Current TimingWidth=".len()..];
-    let (width, rest) = rest.split_once(',')?;
-    let width: u32 = width.parse().ok()?;
-
-    let height_start = rest.find("TimingWidth=")?;
-    let rest = &rest[height_start + "TimingWidth=".len()..];
-    let (height, _) = rest.split_once(',')?;
-    let height: u32 = height.parse().ok()?;
-
-    Some((width, height))
 }
