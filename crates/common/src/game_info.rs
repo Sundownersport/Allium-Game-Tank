@@ -6,7 +6,7 @@ use std::{
 
 use anyhow::Result;
 use chrono::{DateTime, Duration, Utc};
-use log::debug;
+use log::{debug, trace};
 use serde::{Deserialize, Serialize};
 
 use crate::constants::{ALLIUM_GAME_INFO, ALLIUM_GAMES_DIR, ALLIUM_SCRIPTS_DIR};
@@ -140,16 +140,34 @@ pub fn find_guide(path: &Path) -> Option<PathBuf> {
     // Search for Imgs folder upwards, recursively
     let mut parent = path.to_path_buf();
     let mut guide = None;
-    'image: while parent.pop() {
+    'guide: while parent.pop() {
         let mut guide_path = parent.join("Guides");
         if guide_path.is_dir() {
             guide_path.extend(path.strip_prefix(&parent).unwrap());
+
+            debug!("Checking guide path: {:?}", guide_path);
+            guide_path.set_extension("");
+            if guide_path.is_dir() {
+                debug!("Found guide directory: {:?}", guide_path);
+                // Take the first guide for now
+                let entries = fs::read_dir(&guide_path).ok()?;
+                for entry in entries {
+                    let entry = entry.ok()?;
+                    let path = entry.path();
+                    if path.is_file() {
+                        guide = Some(path);
+                        break 'guide;
+                    }
+                }
+            }
+
             const GUIDE_EXTENSIONS: [&str; 1] = ["txt"];
             for ext in &GUIDE_EXTENSIONS {
                 guide_path.set_extension(ext);
+                debug!("Found guide file: {:?}", guide_path);
                 if guide_path.is_file() {
                     guide = Some(guide_path);
-                    break 'image;
+                    break 'guide;
                 }
             }
         }
