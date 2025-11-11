@@ -254,7 +254,7 @@ extensions = ["gb"]
 [[consoles]]
 name = "Game Boy Color"
 cores = ["gambatte", "tgbdual", "gearboy", "mgba", "vbam", "vba_next"]
-patterns = ["GBC", "SGB"]
+patterns = ["GBC"]
 extensions = ["gbc"]
 
 [[consoles]]
