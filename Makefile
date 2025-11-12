@@ -10,7 +10,7 @@ GLIBC_VERSION := 2.28
 -include local.mk
 
 .PHONY: all
-all: dist build package-build $(DIST_DIR)/RetroArch/retroarch $(DIST_DIR)/.allium/bin/dufs $(DIST_DIR)/.allium/bin/syncthing $(DIST_DIR)/.allium/cores/drastic/drastic migrations
+all: dist build package-build $(DIST_DIR)/RetroArch/retroarch $(DIST_DIR)/.allium/bin/dufs $(DIST_DIR)/.allium/bin/syncthing $(DIST_DIR)/.allium/cores/drastic/drastic migrations strip-all
 
 .PHONY: clean
 clean:
@@ -49,6 +49,16 @@ build: third-party/my283
 .PHONY: debug
 debug: third-party/my283
 	cargo zigbuild --target=$(TARGET_TRIPLE).$(GLIBC_VERSION) --features=miyoo --bin=alliumd --bin=allium-launcher --bin=allium-menu --bin=activity-tracker --bin=screenshot --bin=say --bin=show --bin=show-hotkeys --bin=myctl
+
+.PHONY: strip-all
+strip-all:
+	docker run --rm -i -v $(ROOT_DIR):/root/workspace $(TOOLCHAIN) \
+		find dist static migrations \
+			-type f \
+			-not -path "static/.tmp_update/8188fu.ko" \
+			-not -path "dist/.tmp_update/8188fu.ko" \
+			-exec sh -c 'file "{}" | grep "not stripped"' \; \
+			-exec /opt/miyoomini-toolchain/usr/bin/arm-linux-gnueabihf-strip -s {} \;
 
 .PHONY: package-build
 package-build:
@@ -92,8 +102,7 @@ $(DIST_DIR)/.allium/bin/syncthing:
 	TEMP_DIR=$$(mktemp --directory) && \
 		wget "$(SYNCTHING_URL)" -O "$$TEMP_DIR/syncthing.tar.gz" && \
 		tar xf "$$TEMP_DIR/syncthing.tar.gz" --directory="$$TEMP_DIR" && \
-		mv "$$TEMP_DIR/syncthing-linux-arm-$(SYNCTHING_VERSION)/syncthing" "$(DIST_DIR)/.allium/bin/syncthing" && \
-		strip --strip-all "$(DIST_DIR)/.allium/bin/syncthing" || true
+		mv "$$TEMP_DIR/syncthing-linux-arm-$(SYNCTHING_VERSION)/syncthing" "$(DIST_DIR)/.allium/bin/syncthing"
 
 DRASTIC_URL := https://github.com/steward-fu/nds/releases/download/v1.8/drastic-v1.8_miyoo.zip
 $(DIST_DIR)/.allium/cores/drastic/drastic:
